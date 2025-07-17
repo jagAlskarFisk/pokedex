@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { injectQuery } from '@tanstack/angular-query-experimental';
 
 import { ActivatedRoute } from '@angular/router';
+import { StatsBoxComponent } from 'components/stats-box/stats-box.component';
 import { TabButtonComponent } from 'components/tab-button/tab-button.component';
 import { injectTwHostClass } from 'util/inject-tw-host-class.util';
 import { getPokemonByName } from '../../../api/pokemon';
@@ -9,7 +10,7 @@ import { PokemonInfoComponent } from '../../components/pokemon-info/pokemon-info
 
 @Component({
     selector: 'app-pokemon-detail',
-    imports: [PokemonInfoComponent, TabButtonComponent],
+    imports: [PokemonInfoComponent, TabButtonComponent, StatsBoxComponent],
     template: `
         <div class="w-full bg-black text-white h-32 p-2 rounded-md shadow-inner">
             <app-pokemon-info
@@ -23,7 +24,23 @@ import { PokemonInfoComponent } from '../../components/pokemon-info/pokemon-info
             }
         </div>
 
-        <div class="grow bg-gray-200 p-2 rounded-md">{{ selectedTab() }}</div>
+        <div class="grow bg-gray-200 p-2 rounded-md">
+            @if (currentPokemonInfo.isFetching()) {
+                <p>Loading...</p>
+            } @else {
+                @switch (selectedTab()) {
+                    @case ('Abilities') {
+                        <p>Abilities content goes here...</p>
+                    }
+                    @case ('Moves') {
+                        <p>Moves content goes here...</p>
+                    }
+                    @case ('Stats') {
+                        <app-stats-box [stats]="currentPokemonInfo.data()?.stats ?? []" />
+                    }
+                }
+            }
+        </div>
     `,
 })
 export class PokemonDetailContainer {
