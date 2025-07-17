@@ -1,0 +1,12 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Open Bash",
+			"type": "shell",
+			"command": "bash",
+			"isBackground": false,
+			"problemMatcher": []
+		}
+	]
+}
