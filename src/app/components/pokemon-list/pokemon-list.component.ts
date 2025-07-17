@@ -1,6 +1,6 @@
-import { Component, input } from '@angular/core';
-import { SimplePokemon } from 'types/simple-pokemon.type';
+import { Component, input, output } from '@angular/core';
 
+import { NamedAPIResource } from 'pokenode-ts';
 import { PokemonListItemComponent } from '../pokemon-list-item/pokemon-list-item.component';
 
 @Component({
@@ -24,6 +24,16 @@ import { PokemonListItemComponent } from '../pokemon-list-item/pokemon-list-item
                 @for (pokemon of pokemonList(); let index = $index; track pokemon.name) {
                     <app-pokemon-list-item [index]="$index" [pokemon]="pokemon" />
                 }
+                @if (isLoading()) {
+                    <p>Loading...</p>
+                } @else if (canFetchMorePokemon()) {
+                    <button
+                        (click)="loadNextPokemonPage()"
+                        class="w-full text-black bg-cyan-300 p-2 rounded-md mt-4 hover:bg-cyan-400 transition-colors"
+                    >
+                        Fetch more pokemon!
+                    </button>
+                }
             </section>
         </div>
 
@@ -33,5 +43,12 @@ import { PokemonListItemComponent } from '../pokemon-list-item/pokemon-list-item
     imports: [PokemonListItemComponent],
 })
 export class PokemonListComponent {
-    readonly pokemonList = input<SimplePokemon[]>([]);
+    readonly isLoading = input<boolean>(false);
+    readonly pokemonList = input<NamedAPIResource[]>([]);
+    readonly canFetchMorePokemon = input<boolean>(true);
+    getNextPokemonPage = output<void>();
+
+    loadNextPokemonPage() {
+        this.getNextPokemonPage.emit();
+    }
 }

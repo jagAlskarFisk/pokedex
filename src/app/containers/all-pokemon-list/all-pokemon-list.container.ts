@@ -1,103 +1,45 @@
 import { Component, signal } from '@angular/core';
-import { SimplePokemon } from 'types/simple-pokemon.type';
+import { injectQuery } from '@tanstack/angular-query-experimental';
 
+import { NamedAPIResource } from 'pokenode-ts';
+import { getPokemonListPaginated } from '../../../api/pokemon';
 import { PokemonListComponent } from '../../components/pokemon-list/pokemon-list.component';
 
 @Component({
     selector: 'app-all-pokemon-list',
     imports: [PokemonListComponent],
-    template: ` <app-pokemon-list [pokemonList]="allPokemon()" /> `,
+    template: `
+        <app-pokemon-list
+            [pokemonList]="allPokemon()"
+            [isLoading]="pokemonListQuery.isFetching()"
+            [canFetchMorePokemon]="!!nextPageUrl()"
+            (getNextPokemonPage)="getNextPokemonPage()"
+        />
+    `,
 })
 export class AllPokemonListContainer {
-    allPokemon = signal<SimplePokemon[]>(hardcodedResponse.results);
-}
+    nextPageUrl = signal<string | null>(null);
+    allPokemon = signal<NamedAPIResource[]>([]);
 
-// TODO: replace this with a real API call
-// TODO: implement "fetch next page" so we can get more than 20 pokemons
-const hardcodedResponse = {
-    count: 1302,
-    next: 'https://pokeapi.co/api/v2/pokemon?offset=20&limit=20',
-    previous: null,
-    results: [
-        {
-            name: 'bulbasaur',
-            url: 'https://pokeapi.co/api/v2/pokemon/1/',
+    pokemonListQuery = injectQuery(() => ({
+        queryKey: ['pokemon-list'],
+        queryFn: () => {
+            // since the response includes the property `next`, which is the intended paginated url
+            // we can use it to fetch the next page
+            if (this.nextPageUrl()) {
+                return fetch(this.nextPageUrl()).then((res) => res.json());
+            }
+            // initial api call
+            return getPokemonListPaginated(0, 20);
         },
-        {
-            name: 'ivysaur',
-            url: 'https://pokeapi.co/api/v2/pokemon/2/',
+        select: (data) => {
+            this.nextPageUrl.set(data.next);
+            this.allPokemon.update((current) => [...current, ...data.results]);
+            return data;
         },
-        {
-            name: 'venusaur',
-            url: 'https://pokeapi.co/api/v2/pokemon/3/',
-        },
-        {
-            name: 'charmander',
-            url: 'https://pokeapi.co/api/v2/pokemon/4/',
-        },
-        {
-            name: 'charmeleon',
-            url: 'https://pokeapi.co/api/v2/pokemon/5/',
-        },
-        {
-            name: 'charizard',
-            url: 'https://pokeapi.co/api/v2/pokemon/6/',
-        },
-        {
-            name: 'squirtle',
-            url: 'https://pokeapi.co/api/v2/pokemon/7/',
-        },
-        {
-            name: 'wartortle',
-            url: 'https://pokeapi.co/api/v2/pokemon/8/',
-        },
-        {
-            name: 'blastoise',
-            url: 'https://pokeapi.co/api/v2/pokemon/9/',
-        },
-        {
-            name: 'caterpie',
-            url: 'https://pokeapi.co/api/v2/pokemon/10/',
-        },
-        {
-            name: 'metapod',
-            url: 'https://pokeapi.co/api/v2/pokemon/11/',
-        },
-        {
-            name: 'butterfree',
-            url: 'https://pokeapi.co/api/v2/pokemon/12/',
-        },
-        {
-            name: 'weedle',
-            url: 'https://pokeapi.co/api/v2/pokemon/13/',
-        },
-        {
-            name: 'kakuna',
-            url: 'https://pokeapi.co/api/v2/pokemon/14/',
-        },
-        {
-            name: 'beedrill',
-            url: 'https://pokeapi.co/api/v2/pokemon/15/',
-        },
-        {
-            name: 'pidgey',
-            url: 'https://pokeapi.co/api/v2/pokemon/16/',
-        },
-        {
-            name: 'pidgeotto',
-            url: 'https://pokeapi.co/api/v2/pokemon/17/',
-        },
-        {
-            name: 'pidgeot',
-            url: 'https://pokeapi.co/api/v2/pokemon/18/',
-        },
-        {
-            name: 'rattata',
-            url: 'https://pokeapi.co/api/v2/pokemon/19/',
-        },
-        {
-            name: 'raticate',
-            url: 'https://pokeapi.co/api/v2/pokemon/20/',
-        },
-    ],
-};
+    }));
+
+    getNextPokemonPage() {
+        this.pokemonListQuery.refetch();
+    }
+}

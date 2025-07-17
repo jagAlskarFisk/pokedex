@@ -1,7 +1,7 @@
 import { UpperCasePipe } from '@angular/common';
 import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { SimplePokemon } from 'types/simple-pokemon.type';
+import { NamedAPIResource } from 'pokenode-ts';
 
 @Component({
     selector: 'app-pokemon-list-item',
@@ -16,5 +16,5 @@ import { SimplePokemon } from 'types/simple-pokemon.type';
 })
 export class PokemonListItemComponent {
     readonly index = input.required<number>();
-    readonly pokemon = input.required<SimplePokemon>();
+    readonly pokemon = input.required<NamedAPIResource>();
 }
