@@ -1,7 +1,22 @@
 @import 'tailwindcss';
 
+@layer components {
+    .small-button {
+        @apply h-3 w-3 rounded-full mx-1 border border-black/10;
+    }
+
+    .big-button {
+        @apply h-[60px] w-[60px] rounded-full border-4 border-white shadow-[0_0_8px_2px_rgba(0,0,0,0.1)];
+    }
+}
+
 @theme {
     --inset-shadow: -1px -1px 2px 2px grey;
+    --color-pokedex-red: #d71f06;
+    --color-list-item-hover: rgba(200, 200, 200, 0.3);
+
+    --shadow-large: 32px 8px 8px 0px rgba(0, 0, 0, 0.5);
+    --shadow-nav: 4px 4px 8px 4px rgba(0, 0, 0, 0.5);
 }
 
 html,

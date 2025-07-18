@@ -6,12 +6,11 @@ import { NamedAPIResource } from 'pokenode-ts';
 @Component({
     selector: 'app-pokemon-list-item',
     template: `
-        <a [routerLink]="['', { outlets: { detail: [pokemon().name] } }]">
+        <a class="block p-2 rounded-sm text-white no-underline hover:bg-list-item-hover" [routerLink]="['', { outlets: { detail: [pokemon().name] } }]">
             {{ index() + 1 }}
             {{ pokemon().name | uppercase }}
         </a>
     `,
-    styleUrl: './pokemon-list-item.component.scss',
     imports: [RouterLink, UpperCasePipe],
 })
 export class PokemonListItemComponent {

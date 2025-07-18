@@ -21,6 +21,7 @@ export class AllPokemonListContainer {
     nextPageUrl = signal<string | null>(null);
     allPokemon = signal<NamedAPIResource[]>([]);
 
+    // alternatively we can use infinite query
     pokemonListQuery = injectQuery(() => ({
         queryKey: ['pokemon-list'],
         queryFn: () => {
